@@ -5,6 +5,11 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
 const app = express();
+
+// ==========================
+// PORT
+// ==========================
+
 const PORT = process.env.PORT || 5000;
 
 // ==========================
@@ -70,8 +75,10 @@ app.post("/api/register", async (req, res) => {
       });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
     const existingUser = await User.findOne({
-      email: email.toLowerCase()
+      email: cleanEmail
     });
 
     if (existingUser) {
@@ -83,8 +90,8 @@ app.post("/api/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      name: name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: cleanEmail,
       password: hashedPassword
     });
 
@@ -122,8 +129,10 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
     const user = await User.findOne({
-      email: email.toLowerCase()
+      email: cleanEmail
     });
 
     if (!user) {
@@ -175,8 +184,8 @@ mongoose
   .then(() => {
     console.log("MongoDB Atlas connected successfully");
 
-    app.listen(PORT, "127.0.0.1", () => {
-      console.log(`Server running at http://127.0.0.1:${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
